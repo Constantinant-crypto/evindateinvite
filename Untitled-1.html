@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invitation.exe</title>
+
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    font-family: "Courier New", monospace;
+    background: black;
+    color: #00ff88;
+}
+
+#name-screen {
+    position: fixed;
+    inset: 0;
+    background: black;
+    z-index: 200;
+}
+
+#nameCanvas,
+#particleCanvas,
+#fireworksCanvas {
+    position: fixed;
+    inset: 0;
+}
+
+#fireworksCanvas {
+    z-index: 40;
+    pointer-events: none;
+    display: none;
+}
+
+#name-caption {
+    position: absolute;
+    bottom: 16%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #00ff88;
+    font-size: 1rem;
+    opacity: 0;
+    animation: captionAppear 1s forwards;
+    animation-delay: 2.5s;
+}
+
+@keyframes captionAppear {
+    to { opacity: 0.8; }
+}
+
+.fade-out {
+    animation: fadeOut 1s forwards;
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; visibility: hidden; }
+}
+
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    background: black;
+    color: #00ff88;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    z-index: 100;
+}
+
+.progress-container {
+    width: 350px;
+    max-width: 80vw;
+    height: 24px;
+    border: 1px solid #00ff88;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+#progress-bar {
+    width: 0%;
+    height: 100%;
+    background: #00ff88;
+    box-shadow: 0 0 10px #00ff88;
+}
+
+.cursor {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+#main-content {
+    display: none;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+#particleCanvas {
+    z-index: 0;
+}
+
+.card {
+    position: relative;
+    z-index: 2;
+    background: rgba(0,20,10,0.85);
+    border: 1px solid rgba(0,255,136,0.4);
+    border-radius: 20px;
+    padding: 40px;
+    width: 500px;
+    max-width: 80vw;
+    box-shadow: 0 0 35px rgba(0,255,136,0.15);
+    text-align: center;
+}
+
+.italian {
+    font-size: 0.8rem;
+    font-style: italic;
+    opacity: 0.7;
+}
+
+button {
+    margin-top: 20px;
+    background: transparent;
+    color: #00ff88;
+    border: 1px solid #00ff88;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #00ff88;
+    color: black;
+}
+
+.theme-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-top: 25px;
+}
+
+.theme-block {
+    height: 100px;
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-block span {
+    font-size: 1.8rem;
+}
+
+.decrypt-lines {
+    text-align: left;
+    margin-top: 25px;
+}
+
+.bar {
+    color: #00ff88;
+    opacity: 0.85;
+    margin-bottom: 22px;
+}
+
+.yes-celebration {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    animation: celebrationFade 3s forwards;
+}
+
+.yes-text {
+    font-size: clamp(2.2rem, 7vw, 6rem);
+    color: #00ff88;
+    text-align: center;
+    text-shadow: 0 0 20px #00ff88;
+    animation: yesPop 0.8s ease-out;
+}
+
+.yes-subtext {
+    margin-top: 14px;
+    font-size: 1.1rem;
+    opacity: 0.85;
+    text-align: center;
+}
+.celebration-card {
+    position: relative;
+    z-index: 60;
+    background: rgba(0, 12, 6, 0.96);
+    border: 1px solid rgba(0,255,136,0.7);
+    border-radius: 22px;
+    padding: 42px;
+    width: 560px;
+    max-width: 82vw;
+    text-align: center;
+    box-shadow:
+        0 0 30px rgba(0,255,136,0.25),
+        inset 0 0 20px rgba(0,255,136,0.08);
+    animation: cardPop 0.45s ease-out;
+}
+
+.celebration-card h1 {
+    margin-top: 0;
+}
+
+.celebration-card p {
+    font-size: 1.25rem;
+}
+#decrypt-bar {
+    width: 0%;
+    height: 100%;
+    background: #00ff88;
+    box-shadow: 0 0 12px #00ff88;
+    transition: width 0.1s linear;
+}
+.glitch-out {
+    animation: glitchOut 0.9s forwards;
+}
+.end-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: black;
+    color: #00ff88;
+    font-family: "Courier New", monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: endFade 1s ease-out;
+}
+
+@keyframes endFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes glitchOut {
+    0% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    20% {
+        transform: translate(-8px, 4px);
+    }
+    40% {
+        transform: translate(8px, -4px);
+    }
+    60% {
+        transform: translate(-6px, -2px);
+    }
+    80% {
+        transform: translate(6px, 2px);
+    }
+    100% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+}
+
+#decrypt-percent {
+    margin-top: 10px;
+}
+@keyframes cardPop {
+    0% {
+        transform: scale(0.85);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes yesPop {
+    0% {
+        transform: scale(0.4) rotate(-5deg);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.08) rotate(2deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+@keyframes celebrationFade {
+    0% { opacity: 0; }
+    12% { opacity: 1; }
+    82% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+#reveal {
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="fireworksCanvas"></canvas>
+
+<div id="name-screen">
+    <canvas id="nameCanvas"></canvas>
+    <div id="name-caption">> target identified: EVIN<span class="cursor">_</span></div>
+</div>
+
+<div id="loading-screen">
+    <p>Initializing invitation...</p>
+
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <p id="progress-text">0%</p>
+    <p id="status-text">Preparing question<span class="cursor">_</span></p>
+</div>
+
+<div id="main-content">
+
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="card" id="intro">
+        <h1>> invitation.exe<span class="cursor">_</span></h1>
+
+        <p>Dear Evin,</p>
+
+        <p>
+            Most people text, but I decided to make a website
+            to invite you to a date.
+        </p>
+
+        <p class="italian">(Also to flex my coding skills)</p>
+
+        <button onclick="reveal()">run program</button>
+    </div>
+
+    <div class="card" id="reveal">
+        <h1>> output:<span class="cursor">_</span></h1>
+
+        <p>Would you like to go on a date with me?</p>
+
+        <button onclick="yesAnswer()">Yes</button>
+        <button id="noButton" onclick="noAnswer()">No</button>
+    </div>
+
+</div>
+
+<script>
+/* EVIN name particle intro */
+
+const nameCanvas = document.getElementById("nameCanvas");
+const nameCtx = nameCanvas.getContext("2d");
+
+let nameWidth = nameCanvas.width = window.innerWidth;
+let nameHeight = nameCanvas.height = window.innerHeight;
+
+const nameParticles = [];
+let nameTargets = [];
+
+function createNameTargets() {
+    const tempCanvas = document.createElement("canvas");
+    const tempCtx = tempCanvas.getContext("2d");
+
+    tempCanvas.width = nameWidth;
+    tempCanvas.height = nameHeight;
+
+    tempCtx.fillStyle = "white";
+    tempCtx.textAlign = "center";
+    tempCtx.textBaseline = "middle";
+    tempCtx.font = `bold ${Math.min(nameWidth / 4.2, 190)}px Courier New`;
+    tempCtx.fillText("EVIN", nameWidth / 2, nameHeight / 2.4);
+
+    const imageData = tempCtx.getImageData(0, 0, nameWidth, nameHeight);
+    const pixels = imageData.data;
+
+    nameTargets = [];
+
+    const gap = 7;
+
+    for (let y = 0; y < nameHeight; y += gap) {
+        for (let x = 0; x < nameWidth; x += gap) {
+            const index = (y * nameWidth + x) * 4;
+            const alpha = pixels[index + 3];
+
+            if (alpha > 128) {
+                nameTargets.push({ x, y });
+            }
+        }
+    }
+}
+
+function createNameParticles() {
+    nameParticles.length = 0;
+
+    for (let i = 0; i < nameTargets.length; i++) {
+        nameParticles.push({
+            x: Math.random() * nameWidth,
+            y: Math.random() * nameHeight,
+            targetX: nameTargets[i].x,
+            targetY: nameTargets[i].y,
+            vx: 0,
+            vy: 0,
+            size: Math.random() * 1.8 + 1,
+            pulseOffset: Math.random() * Math.PI * 2
+        });
+    }
+}
+
+function animateNameParticles() {
+    nameCtx.clearRect(0, 0, nameWidth, nameHeight);
+
+    const time = Date.now() * 0.004;
+    const pulse = 1 + Math.sin(time) * 0.28;
+
+    for (let p of nameParticles) {
+        const dx = p.targetX - p.x;
+        const dy = p.targetY - p.y;
+
+        p.vx += dx * 0.015;
+        p.vy += dy * 0.015;
+
+        p.vx *= 0.82;
+        p.vy *= 0.82;
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        const glow = 0.45 + Math.sin(time + p.pulseOffset) * 0.35;
+
+        nameCtx.beginPath();
+        nameCtx.arc(p.x, p.y, p.size * pulse, 0, Math.PI * 2);
+        nameCtx.fillStyle = `rgba(0,255,136,${glow})`;
+        nameCtx.fill();
+
+        nameCtx.shadowColor = "#00ff88";
+        nameCtx.shadowBlur = 8 * pulse;
+    }
+
+    nameCtx.shadowBlur = 0;
+    requestAnimationFrame(animateNameParticles);
+}
+
+createNameTargets();
+createNameParticles();
+animateNameParticles();
+
+setTimeout(() => {
+    document.getElementById("name-screen").classList.add("fade-out");
+
+    setTimeout(() => {
+        document.getElementById("name-screen").style.display = "none";
+        startLoadingScreen();
+    }, 1000);
+}, 5200);
+
+/* Loading screen */
+
+let progress = 0;
+
+const progressBar = document.getElementById("progress-bar");
+const progressText = document.getElementById("progress-text");
+const statusText = document.getElementById("status-text");
+
+const messages = [
+    "Overthinking",
+    "Checking confidence levels",
+    "Overthinking again",
+    "Compiling invitation",
+    "Calculating optimal date strategy",
+    "Suppressing awkwardness",
+    "Generating Yung Lean courage",
+    "Code is ready"
+];
+
+function startLoadingScreen() {
+    document.getElementById("loading-screen").style.display = "flex";
+
+    const interval = setInterval(() => {
+        progress += Math.random() * 5;
+
+        if (progress > 100) progress = 100;
+
+        progressBar.style.width = progress + "%";
+        progressText.textContent = Math.floor(progress) + "%";
+
+        const index = Math.min(Math.floor(progress / 15), messages.length - 1);
+        statusText.innerHTML = messages[index] + '<span class="cursor">_</span>';
+
+        if (progress >= 100) {
+            clearInterval(interval);
+            statusText.innerHTML = 'Invitation ready<span class="cursor">_</span>';
+
+            setTimeout(() => {
+                document.getElementById("loading-screen").style.display = "none";
+                document.getElementById("main-content").style.display = "flex";
+                startParticles();
+            }, 1000);
+        }
+    }, 200);
+}
+
+/* Invitation interaction */
+
+function reveal() {
+    startCyberpunkMusic();
+
+    document.getElementById("intro").style.display = "none";
+    document.getElementById("reveal").style.display = "block";
+}
+
+const noMessages = [
+    "Wrong answer",
+    "This makes me very sad",
+    "Are you sure?",
+    "You can do better",
+    "The algorithm disagrees",
+    "What if I let you touch my boobs",
+    "Ouch, still a 'No'?",
+    "Only one option remains..."
+];
+
+let noIndex = 0;
+let clickedNoAtLeastOnce = false;
+
+function noAnswer() {
+    clickedNoAtLeastOnce = true;
+
+    const button = document.getElementById("noButton");
+
+    if (noIndex < noMessages.length) {
+        button.textContent = noMessages[noIndex];
+        noIndex++;
+    } else {
+        button.textContent = "Yes";
+        button.style.background = "#00ff88";
+        button.style.color = "black";
+    }
+}
+
+function yesAnswer() {
+    startFireworks();
+    formSmileyFace();
+
+    document.getElementById("reveal").style.display = "none";
+
+    const celebration = document.createElement("div");
+    celebration.className = "celebration-card";
+
+    if (clickedNoAtLeastOnce) {
+        celebration.innerHTML = `
+            
+            <p>TOOK YOU LONG ENOUGH.</p>
+            <p class="italian">The system has logged this hesitation.</p>
+        `;
+    } else {
+        celebration.innerHTML = `
+            
+            <p>CORRECT CHOICE DETECTED.</p>
+            <p class="italian">No hesitation detected. Much suspicious. Very appreciated.</p>
+        `;
+    }
+
+    document.getElementById("main-content").appendChild(celebration);
+
+    setTimeout(() => {
+        celebration.remove();
+        stopFireworks();
+        releaseParticles();
+        document.getElementById("reveal").style.display = "block";
+        showGuessCard();
+    }, 4200);
+}
+
+function showGuessCard() {
+    document.getElementById("reveal").innerHTML = `
+        <h1>> classified theme<span class="cursor">_</span></h1>
+
+        <p>Guess the date theme to unlock the mission briefing.</p>
+
+        <div class="theme-grid">
+            <button class="theme-block" onclick="wrongTheme('Coffee is tempting, but not for now sarryyy.')">
+                <span>☕</span>
+                Coffee
+            </button>
+
+            <button class="theme-block" onclick="wrongTheme('Movie night rejected. This mission requires further dating.')">
+                <span>🎬</span>
+                Movie
+            </button>
+
+            <button class="theme-block" onclick="wrongTheme('Not quite. But if it goes well, you might see my exhibit later😉.')">
+                <span>🎨</span>
+                Museum
+            </button>
+
+            <button class="theme-block" onclick="correctTheme()">
+                <span>🎵</span>
+                Music
+            </button>
+        </div>
+
+        <p id="theme-message" class="italian"></p>
+    `;
+}
+
+function wrongTheme(message) {
+    document.getElementById("theme-message").textContent =
+        "> " + message + " Try again.";
+}
+
+function correctTheme() {
+    document.getElementById("theme-message").textContent =
+        "> Correct. Access granted. Loading briefing...";
+
+    setTimeout(() => {
+        showDecryptCard();
+    }, 1600);
+}
+
+function showDecryptCard() {
+
+    document.getElementById("reveal").innerHTML = `
+        <h1>> decrypting<span class="cursor">_</span></h1>
+
+        <div class="decrypt-lines">
+
+            <p id="decrypt-message">
+                Initializing...
+            </p>
+
+            <div class="progress-container">
+                <div id="decrypt-bar"></div>
+            </div>
+
+            <p id="decrypt-percent">0%</p>
+
+        </div>
+    `;
+
+    let progress = 0;
+
+    const bar = document.getElementById("decrypt-bar");
+    const percent = document.getElementById("decrypt-percent");
+    const message = document.getElementById("decrypt-message");
+
+    const steps = [
+        "Decrypting date plan...",
+        "Checking weather...",
+        "Generating playlist...",
+        "Calculating optimal walking route...",
+        "Suppressing spoilers...",
+        "Preparing mission briefing..."
+    ];
+
+    const interval = setInterval(() => {
+
+        progress += Math.random() * 8;
+
+        if (progress > 100) progress = 100;
+
+        bar.style.width = progress + "%";
+        percent.textContent = Math.floor(progress) + "%";
+
+        const index = Math.min(
+            Math.floor(progress / 18),
+            steps.length - 1
+        );
+
+        message.textContent = steps[index];
+
+        if (progress >= 100) {
+
+            clearInterval(interval);
+
+            message.innerHTML =
+                '✓ Briefing ready<span class="cursor">_</span>';
+
+            percent.style.display = "none";
+
+            setTimeout(() => {
+                showMissionBriefing();
+            }, 1500);
+        }
+
+    }, 120);
+}
+
+function showMissionBriefing() {
+    document.getElementById("reveal").innerHTML = `
+        <h1>> mission briefing<span class="cursor">_</span></h1>
+
+        <div class="briefing">
+
+            <p><strong>MISSION:</strong> Music Walk </p>
+
+
+
+            <p>> DATE</p>
+            <p>Wednesday, June 11</p>
+
+
+
+            <p>> START TIME</p>
+            <p>19:00 (SHARP)</p>
+
+
+
+            <p>> MEETING COORDINATES</p>
+            <p>50°49'28.0"N 4°20'05.0"E</p>
+
+
+
+            <p>> REQUIRED EQUIPMENT</p>
+
+            <p>[✓] Comfy shoes</p>
+            <p>[✓] Headphones</p>
+            <p>[✓] Decent music taste</p>
+
+
+
+
+            <p>> KNOWN BUGS</p>
+
+            <p>[ ] May lead to drunk walking</p>
+            <p>[ ] May lead to Constantina asking a bunch of weird hypothetical questions</p>
+
+
+
+            <button onclick="showFinalCard()">complete mission</button>
+
+        </div>
+    `;
+}
+
+function showFinalCard() {
+    document.getElementById("reveal").innerHTML = `
+        <h1>> execution complete<span class="cursor">_</span></h1>
+
+        <p>Invitation successfully delivered.</p>
+        <p>Response successfully received.</p>
+        <p>Constantina, who is inside this computer, is smilling rn :)</p>
+
+
+        <button onclick="finalExplosion()">self destruct invitation</button>
+    `;
+}
+
+function finalExplosion() {
+    document.getElementById("reveal").style.display = "none";
+
+    collectParticles();
+
+    setTimeout(() => {
+        explodeParticles();
+        startFireworks();
+    }, 1600);
+
+    setTimeout(() => {
+        stopFireworks();
+
+        const endScreen = document.createElement("div");
+        endScreen.className = "end-screen";
+        endScreen.innerHTML = `
+            <h1>> program terminated<span class="cursor">_</span></h1>
+            <p>🫰</p>
+        `;
+
+        document.body.appendChild(endScreen);
+    }, 3300);
+}
+let audioCtx;
+let cyberpunkLoop;
+let musicStarted = false;
+
+function startCyberpunkMusic() {
+
+    if (musicStarted) return;
+    musicStarted = true;
+
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function note(freq, start, duration, volume = 0.02) {
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = "sawtooth";
+
+        osc.frequency.value = freq;
+
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.linearRampToValueAtTime(volume, start + 0.05);
+        gain.gain.linearRampToValueAtTime(0.0001, start + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(start);
+        osc.stop(start + duration);
+    }
+
+    function playPattern() {
+
+        const now = audioCtx.currentTime;
+
+        // Bass
+        note(110, now + 0.0, 0.7, 0.03);
+        note(147, now + 1.0, 0.7, 0.03);
+        note(165, now + 2.0, 0.7, 0.03);
+        note(147, now + 3.0, 0.7, 0.03);
+
+        // Lead
+        note(440, now + 0.2, 0.3);
+        note(523, now + 0.6, 0.3);
+        note(659, now + 1.2, 0.3);
+        note(784, now + 1.6, 0.3);
+
+        note(659, now + 2.2, 0.3);
+        note(523, now + 2.6, 0.3);
+        note(440, now + 3.2, 0.3);
+        note(523, now + 3.6, 0.3);
+    }
+
+    playPattern();
+
+    synthLoop = setInterval(playPattern, 4000);
+}
+function stopCyberpunkMusic() {
+    clearInterval(cyberpunkLoop);
+    musicStarted = false;
+}
+
+/* Moving particle network background */
+
+let networkParticles = [];
+let particleMode = "network";
+
+function startParticles() {
+    const canvas = document.getElementById("particleCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    networkParticles = [];
+    const particleCount = 90;
+
+    for (let i = 0; i < particleCount; i++) {
+        networkParticles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            targetX: null,
+            targetY: null
+        });
+    }
+
+    function animateParticles() {
+        ctx.clearRect(0, 0, width, height);
+
+        for (let p of networkParticles) {
+            if ((particleMode === "smiley" || particleMode === "collect") && p.targetX !== null) {
+                const dx = p.targetX - p.x;
+                const dy = p.targetY - p.y;
+
+                p.vx += dx * 0.025;
+                p.vy += dy * 0.025;
+
+                p.vx *= 0.82;
+                p.vy *= 0.82;
+            } else {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+            }
+
+            p.x += p.vx;
+            p.y += p.vy;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, particleMode === "smiley" ? 2.6 : 2, 0, Math.PI * 2);
+            ctx.fillStyle = "#00ff88";
+            ctx.fill();
+        }
+
+        for (let i = 0; i < networkParticles.length; i++) {
+            for (let j = i + 1; j < networkParticles.length; j++) {
+                const dx = networkParticles[i].x - networkParticles[j].x;
+                const dy = networkParticles[i].y - networkParticles[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 120) {
+                    const opacity = 1 - distance / 120;
+
+                    ctx.strokeStyle = `rgba(0,255,136,${opacity * 0.25})`;
+                    ctx.lineWidth = 1;
+
+                    ctx.beginPath();
+                    ctx.moveTo(networkParticles[i].x, networkParticles[i].y);
+                    ctx.lineTo(networkParticles[j].x, networkParticles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        requestAnimationFrame(animateParticles);
+    }
+
+    animateParticles();
+
+    window.addEventListener("resize", () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+}
+function formSmileyFace() {
+    particleMode = "smiley";
+
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const radius = Math.min(window.innerWidth, window.innerHeight) * 0.18;
+
+    const targets = [];
+
+    // face circle
+    for (let i = 0; i < 46; i++) {
+        const angle = (Math.PI * 2 * i) / 46;
+        targets.push({
+            x: centerX + Math.cos(angle) * radius,
+            y: centerY + Math.sin(angle) * radius
+        });
+    }
+
+    // left eye
+    for (let i = 0; i < 10; i++) {
+        const angle = (Math.PI * 2 * i) / 10;
+        targets.push({
+            x: centerX - radius * 0.38 + Math.cos(angle) * radius * 0.08,
+            y: centerY - radius * 0.25 + Math.sin(angle) * radius * 0.08
+        });
+    }
+
+    // right eye
+    for (let i = 0; i < 10; i++) {
+        const angle = (Math.PI * 2 * i) / 10;
+        targets.push({
+            x: centerX + radius * 0.38 + Math.cos(angle) * radius * 0.08,
+            y: centerY - radius * 0.25 + Math.sin(angle) * radius * 0.08
+        });
+    }
+
+    // smile arc
+    for (let i = 0; i < 30; i++) {
+        const angle = Math.PI * 0.18 + (Math.PI * 0.64 * i) / 29;
+        targets.push({
+            x: centerX + Math.cos(angle) * radius * 0.55,
+            y: centerY + Math.sin(angle) * radius * 0.55
+        });
+    }
+
+    networkParticles.forEach((p, i) => {
+        const target = targets[i % targets.length];
+        p.targetX = target.x;
+        p.targetY = target.y;
+    });
+}
+
+function releaseParticles() {
+    particleMode = "network";
+
+    networkParticles.forEach(p => {
+        p.targetX = null;
+        p.targetY = null;
+        p.vx = (Math.random() - 0.5) * 0.8;
+        p.vy = (Math.random() - 0.5) * 0.8;
+    });
+}
+
+/* Fireworks */
+
+let fireworksRunning = false;
+let fireworks = [];
+
+function startFireworks() {
+    const canvas = document.getElementById("fireworksCanvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.style.display = "block";
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    fireworksRunning = true;
+    fireworks = [];
+
+    function createFirework() {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height * 0.55 + 40;
+
+        for (let i = 0; i < 80; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 5 + 2;
+
+            fireworks.push({
+                x,
+                y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                life: 75,
+                maxLife: 75,
+                size: Math.random() * 2 + 1
+            });
+        }
+    }
+
+    createFirework();
+
+    const fireworkInterval = setInterval(() => {
+        if (!fireworksRunning) {
+            clearInterval(fireworkInterval);
+            return;
+        }
+
+        createFirework();
+    }, 430);
+
+    function animateFireworks() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = fireworks.length - 1; i >= 0; i--) {
+            const p = fireworks[i];
+
+            p.x += p.vx;
+            p.y += p.vy;
+
+            p.vy += 0.035;
+            p.vx *= 0.985;
+            p.vy *= 0.985;
+
+            p.life--;
+
+            const opacity = p.life / p.maxLife;
+
+            ctx.shadowColor = "#00ff88";
+            ctx.shadowBlur = 12;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(0,255,136,${opacity})`;
+            ctx.fill();
+
+            if (p.life <= 0) {
+                fireworks.splice(i, 1);
+            }
+        }
+
+        ctx.shadowBlur = 0;
+
+        if (fireworksRunning || fireworks.length > 0) {
+            requestAnimationFrame(animateFireworks);
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    }
+
+    animateFireworks();
+}
+
+function stopFireworks() {
+    fireworksRunning = false;
+
+    setTimeout(() => {
+        const canvas = document.getElementById("fireworksCanvas");
+        canvas.style.display = "none";
+    }, 700);
+}
+
+function collectParticles() {
+    particleMode = "collect";
+
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+
+    networkParticles.forEach(p => {
+        p.targetX = centerX;
+        p.targetY = centerY;
+    });
+}
+
+function explodeParticles() {
+    particleMode = "network";
+
+    networkParticles.forEach(p => {
+        p.targetX = null;
+        p.targetY = null;
+        p.vx = (Math.random() - 0.5) * 14;
+        p.vy = (Math.random() - 0.5) * 14;
+    });
+}
+</script>
+
+</body>
+</html>
